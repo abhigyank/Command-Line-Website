@@ -1,0 +1,48 @@
+
+.terminal{
+  font-family: monospace;
+  color: #aaa;
+  background-color: #000;
+  font-size: 1vw;
+  line-height: 14px;
+  box-sizing: border-box;
+  padding: 1vw;
+}
+.user{
+  color: #0c0;
+}
+.clipboard{
+  opacity: 0;
+}
+.command,.result{
+  padding-bottom: 0.2vw;
+}
+.cursor{
+  -webkit-animation: 1s blink infinite;
+  animation: 1s blink infinite;
+  border: none;
+}
+@keyframes blink {
+  50% {
+    color: #000;
+    background: #fff;
+  }
+}
+@-webkit-keyframes blink {
+  50% {
+    color: #000;
+    background: #fff;
+  }
+}
+@-ms-keyframes blink {
+  50% {
+    color: #000;
+    background: #fff;
+  }
+}
+@-moz-keyframes blink {
+  50% {
+    color: #000;
+    background: #fff;
+  }
+}
