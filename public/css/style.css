@@ -1,9 +1,8 @@
-
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono');
 .terminal{
-  font-family: monospace;
   color: #aaa;
   background-color: #000;
-  font-size: 1vw;
+  font: 16px/1.2 'Share Tech Mono',monospace;
   line-height: 14px;
   box-sizing: border-box;
   padding: 1vw;
