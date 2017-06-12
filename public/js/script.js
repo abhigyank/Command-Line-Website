@@ -1,6 +1,10 @@
 var clear = $('.terminal-output').html();
 var array = [];
 var counter = -1;
+var login = 0;
+var email = 0;
+var password = 0;
+var e = "";
 $(document).ready(function() {
   $('textarea').focus();
 });
@@ -17,7 +21,7 @@ function reset(){
 $('textarea').keyup(function(e) {
   var command = $('textarea').val();
   command = command.replace(/(\r\n|\n|\r)/gm,"");
-  if(e.which==38){
+  if(e.which==38  && login!=1){
     if(counter>=0){
       if(counter==array.length -1){
         temp_command = command;
@@ -35,7 +39,7 @@ $('textarea').keyup(function(e) {
     $('.cursor').html('&nbsp');
     return;
   }
-  else if(e.which==40){
+  else if(e.which==40  && login!=1){
     if(counter<array.length-2){
       $('textarea').val(array[counter+2]);
       command = array[counter+2];
@@ -68,7 +72,7 @@ $('textarea').keyup(function(e) {
     }
     return;
   }
-  else if(e.which==13){
+  else if(e.which==13  && login!=1){
     if(command=="clear"){
       $('.terminal-output').empty();
       $('.terminal-output').append(clear);
@@ -76,7 +80,7 @@ $('textarea').keyup(function(e) {
       return;
     }
     else if(command=="help"){
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>&gt;&nbsp;' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
       $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>List of commands<br> signup - to signup<br> \
         login - to login into the terminal.<br>\
        clear - to clear screen\
@@ -85,13 +89,22 @@ $('textarea').keyup(function(e) {
       return;
     }
     else if(command=="signup"){
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>&gt;&nbsp;' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
       reset();
       window.location = "signup";
       return;
     }
+    else if(command=="login"){
+      $('#root').hide();
+      $('.prompt').append('<span id="email">email:</span>');  
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
+      reset();
+      login = 1;
+      email = 1;
+      return;
+    }
     else{
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>&gt;&nbsp;' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>No command \''+command+'\' found.</span></div></div><br>');
         $('textarea').val('');
         $('#live').html('');
@@ -105,7 +118,32 @@ $('textarea').keyup(function(e) {
     counter=array.length-1;
     return;
   }
-  else{
+  else if((e.which==40 || e.which==38)  && login==1){
+    var temp = $('textarea').focus().val();
+    $('textarea').val('').val(temp);
+    $('#live').html(command);
+    $('#live2').html('');
+    $('.cursor').html('&nbsp');
+  } 
+  else if(e.which==13  && email==1){
+    e = command;
+    $('#email').html('password: ');
+    email = 0;
+    password = 1;
+    reset();
+  }
+  else if(e.which==13  && password==1){
+    console.log(command);
+    $('#email').hide();
+    $('#root').show();
+    //Post request to login using e and command value
+    login = 0;
+    password = 0;
+    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Logged in.</span></div></div><br>');    
+    reset();
+    e = "";
+  }
+  else if(password!=1){
     $('#live').html('');
     $('#live').append($('textarea').val().substring(0,$('textarea').prop("selectionStart")));
   }
