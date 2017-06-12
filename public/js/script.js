@@ -77,10 +77,17 @@ $('textarea').keyup(function(e) {
     }
     else if(command=="help"){
       $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>&gt;&nbsp;' + command + '</span></div></div>');
-      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>List of commands<br> login - to login into the terminal.<br>\
+      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>List of commands<br> signup - to signup<br> \
+        login - to login into the terminal.<br>\
        clear - to clear screen\
        </span></div></div><br>');
       reset();
+      return;
+    }
+    else if(command=="signup"){
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>&gt;&nbsp;' + command + '</span></div></div>');
+      reset();
+      window.location = "signup";
       return;
     }
     else{
