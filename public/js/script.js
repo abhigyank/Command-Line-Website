@@ -4,7 +4,9 @@ var counter = -1;
 var login = 0;
 var email = 0;
 var password = 0;
-var e = "";
+var em = "";
+var user = 'guest';
+var logged = 0;
 $(document).ready(function() {
   $('textarea').focus();
 });
@@ -77,34 +79,38 @@ $('textarea').keyup(function(e) {
       $('.terminal-output').empty();
       $('.terminal-output').append(clear);
       reset();
-      return;
     }
     else if(command=="help"){
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + user + '$ </span><span>' + command + '</span></div></div>');
       $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>List of commands<br> signup - to signup<br> \
         login - to login into the terminal.<br>\
        clear - to clear screen\
        </span></div></div><br>');
       reset();
-      return;
     }
     else if(command=="signup"){
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + user + '$ </span><span>' + command + '</span></div></div>');
       reset();
       window.location = "signup";
       return;
     }
     else if(command=="login"){
-      $('#root').hide();
-      $('.prompt').append('<span id="email">email:</span>');  
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
-      reset();
-      login = 1;
-      email = 1;
-      return;
+      if(!logged){
+        $('#root').hide();
+        $('.prompt').append('<span id="email">email:</span>');  
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + user + '$ </span><span>' + command + '</span></div></div>');
+        reset();
+        login = 1;
+        email = 1;
+      }
+      else{
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + user + '$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Already logged in.</span></div></div><br>');
+        reset();
+      }
     }
     else{
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ abhigyan$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + user + '$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>No command \''+command+'\' found.</span></div></div><br>');
         $('textarea').val('');
         $('#live').html('');
@@ -126,22 +132,38 @@ $('textarea').keyup(function(e) {
     $('.cursor').html('&nbsp');
   } 
   else if(e.which==13  && email==1){
-    e = command;
+    em = command;
     $('#email').html('password: ');
     email = 0;
     password = 1;
     reset();
   }
   else if(e.which==13  && password==1){
-    console.log(command);
-    $('#email').hide();
+    $('#email').remove();
     $('#root').show();
-    //Post request to login using e and command value
+    //Post request to login using em and command value
     login = 0;
     password = 0;
-    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Logged in.</span></div></div><br>');    
     reset();
-    e = "";
+    $.ajax({
+    type:'post',
+    datatype :'json',
+    data:{email:em,password:command},
+    url:'/login'
+  }).done(function(data){
+    if(data.value=='1'){
+      user = data.name;
+      logged = 1;
+      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Logged in.</span></div></div><br>');    
+      $('#root').html('root:~/ ' + user + '$ ');
+    }
+    else{
+      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Login failed.</span></div></div><br>');    
+    }
+  }).fail(function(data){
+    console.log("internal error :" + data);
+  });
+  em = ""
   }
   else if(password!=1){
     $('#live').html('');
