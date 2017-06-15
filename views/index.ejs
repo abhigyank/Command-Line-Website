@@ -25,5 +25,9 @@
     </div>
   </div>
   <script src="js/script.js"></script>
+  <% if(user){%>
+  <script>var username = '<%= user.local.name %>';
+  logged = 1;</script>
+  <% } %>
 </body>
 </html>
