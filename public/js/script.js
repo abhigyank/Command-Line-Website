@@ -11,8 +11,10 @@ $(document).ready(function() {
   $('#root').html('root:~/ ' + username + '$ ');
   $('textarea').focus();
 });
-$('textarea').blur(function(){
-  $('textarea').focus();
+$('textarea').blur(function(e){
+  setTimeout(function(){
+    $('textarea').focus();    
+  }, 50);
 });
 var temp_command = '';
 function reset(){
@@ -22,13 +24,13 @@ function reset(){
   $('.cursor').html('&nbsp');
 };
 $('textarea').keyup(function(e) {
+  var command = $('textarea').val();
+  command = command.replace(/(\r\n|\n|\r)/gm,"");
   if(command.search('<')!=-1 || command.search('>')!=-1){
     alert('> or < not allowed.');
     $('textarea').val($('textarea').val().substring(0,$('textarea').prop("selectionStart")-1));
     return;
   }
-  var command = $('textarea').val();
-  command = command.replace(/(\r\n|\n|\r)/gm,"");
   if(e.which==38  && login!=1){
     if(counter>=0){
       if(counter==array.length -1){
