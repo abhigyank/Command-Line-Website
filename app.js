@@ -11,7 +11,7 @@ var http = require('http').Server(app);
 var path = require('path');
 var port = process.env.PORT || 3000;
 var configDB = require('./config/database.js');
-mongoose.connect("mongodb://localhost/user_data"); // connect to our database
+mongoose.connect(configDB.url); // connect to our database
 http.listen(port,function(){
 	console.log("Listening",http.address().port);
 });
