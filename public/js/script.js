@@ -8,7 +8,7 @@ var em = "";
 var username = 'guest';
 var logged = 0;
 $(document).ready(function() {
-  $('#root').html('root:~/ ' + username + '$ ');
+  $('#root').html('root@' + username + ': ~$ ');
   $('textarea').focus();
 });
 $('textarea').blur(function(e){
@@ -99,7 +99,7 @@ $('textarea').keyup(function(e) {
       reset();
     }
     else if(command=="help"){
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + username + '$ </span><span>' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
       $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>List of commands<br> signup - to signup<br> \
        login - to login into the terminal.<br>\
        clear - to clear screen<br>\
@@ -108,7 +108,7 @@ $('textarea').keyup(function(e) {
       reset();
     }
     else if(command=="signup"){
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + username + '$ </span><span>' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
       reset();
       window.open('signup', '_blank');
 
@@ -118,13 +118,13 @@ $('textarea').keyup(function(e) {
       if(!logged){
         $('#root').hide();
         $('.prompt').append('<span id="email">email:</span>');  
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + username + '$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
         reset();
         login = 1;
         email = 1;
       }
       else{
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + username + '$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Already logged in.</span></div></div><br>');
         reset();
       }
@@ -135,7 +135,7 @@ $('textarea').keyup(function(e) {
       return;
     }
     else{
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root:~/ ' + username + '$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>No command \''+command+'\' found.</span></div></div><br>');
         $('textarea').val('');
         $('#live').html('');
@@ -180,7 +180,7 @@ $('textarea').keyup(function(e) {
       username = data.name;
       logged = 1;
       $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Logged in.</span></div></div><br>');    
-      $('#root').html('root:~/ ' + username + '$ ');
+      $('#root').html('root@' + username + ': ~$ ');
     }
     else{
       $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Login failed.</span></div></div><br>');    
