@@ -47,7 +47,7 @@ Once you have the pre-requisite services up and running and dependencies install
 
 To run the website, go to the `Command-Line-Website` directory and run:
 
-`node app.js`
+`node app.js`  or 'nodejs app.js'
 
 You should see `listening 3000` on the terminal.
 
@@ -72,6 +72,7 @@ To use only the frontend of this repository which includes the terminal UI and U
 ##  Terminal commands
 
 All the commands are recognised in `script.js` in public/js/ directory. Any additional commands can be added there and existing command's behavior can be modified.
+
 
 ## Database Schema
 
