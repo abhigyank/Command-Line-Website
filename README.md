@@ -73,7 +73,6 @@ To use only the frontend of this repository which includes the terminal UI and U
 
 All the commands are recognised in `script.js` in public/js/ directory. Any additional commands can be added there and existing command's behavior can be modified.
 
-
 ## Database Schema
 
 The user details schema is modelled in `user.js` in model. Authentication is done using PassportJs middleware and configured in `passport.js`.
