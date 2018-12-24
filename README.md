@@ -47,7 +47,7 @@ Once you have the pre-requisite services up and running and dependencies install
 
 To run the website, go to the `Command-Line-Website` directory and run:
 
-`node app.js`
+`node app.js`  or 'nodejs app.js'
 
 You should see `listening 3000` on the terminal.
 
