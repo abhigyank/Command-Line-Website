@@ -1,3 +1,6 @@
+const { makeDir } = require('./helpers/folder.js');
+
+
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
 		res.render('index', {
@@ -39,6 +42,13 @@ module.exports = function(app, passport){
 			res.send('0');
 		}
 	});
+
+	// Receives an ajax get request from the client site to create a folder
+	// The request will contain the path where to create folder and usernam
+	app.get('/mkdir', function(req, res) {
+		// call makeDir function here with appropriate function paramters from req
+    });
+
 	app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
