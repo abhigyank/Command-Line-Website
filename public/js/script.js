@@ -195,12 +195,13 @@ $('textarea').keyup(function(e) {
 
   else if(e.which==67 && ctrl)
   {
-    if(email==1)
+    if((email==1) || (password==1))
     {
       $('#email').remove();
       $('#root').show();
       email=0;
       login=0;
+      password = 0;
     }
       $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
       reset();
