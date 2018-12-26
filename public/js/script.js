@@ -203,8 +203,11 @@ $('textarea').keyup(function(e) {
       login=0;
       password = 0;
     }
-      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-      reset();
+    else {
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '^C' + '</span></div></div>');
+    }
+    reset();
+    return;
   }
 
   else if((e.which==40 || e.which==38)  && login==1){
