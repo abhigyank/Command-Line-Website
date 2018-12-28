@@ -1,4 +1,4 @@
-const { makeDir } = require('./helpers/folder.js');
+const  makeDir  = require('./helpers/folder.js');
 
 
 module.exports = function(app, passport){
@@ -46,7 +46,13 @@ module.exports = function(app, passport){
 	// Receives an ajax get request from the client site to create a folder
 	// The request will contain the path where to create folder and usernam
 	app.get('/mkdir', function(req, res) {
-		// call makeDir function here with appropriate function paramters from req
+
+		  var i = req.url.indexOf('?');
+      var query = req.url.substr(i+13);       //Extracting name of folder from req.query
+      makeDir.makeDir( query);
+      return res.send("0");
+    // call makeDir function here with appropriate function paramters from req
+	
     });
 
 	app.get('/logout', function(req, res) {

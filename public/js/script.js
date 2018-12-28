@@ -121,7 +121,8 @@ $('textarea').keyup(function(e) {
        login - to login into the terminal<br>\
        clear - to clear screen<br>\
        logout - to logout of session<br>\
-       press ctrl + c - to abort a currently running process\
+       press ctrl + c - to abort a currently running process<br>\
+       mkdir - to create a directory or folder\
        </span></div></div><br>');
       reset();
     }
@@ -142,6 +143,41 @@ $('textarea').keyup(function(e) {
       }
       return;
     }
+    else if(command.includes("mkdir")==true)
+    {
+      $.ajax({
+        type:'get',
+        datatype :'json',
+        data:{nameFolder: command.slice(5)},          
+        url:"/mkdir"
+        }).done(function(data){
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+          reset();
+        }).fail(function(jqXHR,exception){
+       $('.trminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+                
+        var msg = '';
+        if (jqXHR.status === 0) {
+            msg = 'Not connect.\n Verify Network.';
+        } else if (jqXHR.status == 404) {
+            msg = 'Requested page not found. [404]';
+        } else if (jqXHR.status == 500) {
+            msg = 'Internal Server Error [500].';
+        } else if (exception === 'parsererror') {
+            msg = 'Requested JSON parse failed.';
+        } else if (exception === 'timeout') {
+            msg = 'Time out error.';
+        } else if (exception === 'abort') {
+            msg = 'Ajax request aborted.';
+        } else {
+            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+          if (data) console.error(data)
+          else console.log('Success!')
+    }
+      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot create directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
+          reset();
+      });
+    } 
 
     else if(command=="login"){
 
