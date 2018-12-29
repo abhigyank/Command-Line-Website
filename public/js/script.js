@@ -5,6 +5,7 @@ var login = 0;
 var email = 0;
 var password = 0;
 var em = "";
+var nameFolder = "";
 var username = 'guest';
 var logged = 0;
 $(document).ready(function() {
@@ -148,7 +149,7 @@ $('textarea').keyup(function(e) {
       $.ajax({
         type:'get',
         datatype :'json',
-        data:{nameFolder: command.slice(5)},          
+        data:{nameFolder: command.split(" ")[1].trim(), username : username},    
         url:"/mkdir"
         }).done(function(data){
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');

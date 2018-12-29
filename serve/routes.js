@@ -47,9 +47,7 @@ module.exports = function(app, passport){
 	// The request will contain the path where to create folder and usernam
 	app.get('/mkdir', function(req, res) {
 
-		  var i = req.url.indexOf('?');
-      var query = req.url.substr(i+13);       //Extracting name of folder from req.query
-      makeDir.makeDir( query);
+      makeDir.makeDir(req.query.nameFolder,req.query.username);
       return res.send("0");
     // call makeDir function here with appropriate function paramters from req
 	
