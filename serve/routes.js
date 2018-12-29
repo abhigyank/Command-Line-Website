@@ -1,4 +1,4 @@
-const { makeDir } = require('./helpers/folder.js');
+const  makeDir  = require('./helpers/folder.js');
 
 
 module.exports = function(app, passport){

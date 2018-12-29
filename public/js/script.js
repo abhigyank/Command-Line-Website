@@ -52,6 +52,7 @@ $('textarea').keyup(function(e) {
       if(counter==array.length -1){
         temp_command = command;
       }
+      
       $('textarea').val(array[counter]);
       command = array[counter];
       counter-=1;
@@ -98,8 +99,10 @@ $('textarea').keyup(function(e) {
     var prev = command.substring(0, index);
     $('#live').html(prev);
 
-    if(prev==command)
+    if(prev==command){
       $('.cursor').html('&nbsp');
+      $('#live2').html('');
+    }
     else{
       $('.cursor').html(command[index]);
       $('#live2').html(command.substring(index+1, command.length))
@@ -258,14 +261,20 @@ $('textarea').keyup(function(e) {
     $('#live').html('');
     if(i == -1 || array.length == 0){
         $('#live').append($('textarea').val().substring(0,$('textarea').prop("selectionStart")));
-        if($('textarea').prop("selectionStart") == command.length)
+        if($('textarea').prop("selectionStart") == command.length) {
           $('#live2').html('');
+          $('.cursor').html('&nbsp');
+        }
     }
-    else {
+   else {
         $('#live').html(command);
         var index = $('textarea').prop("selectionStart");
-        $('.cursor').html(command[index]);
-        $('#live2').html("<font color='yellow'>" + array[i].substring(index, array[i].length)  + "</font>" );
+        $('.cursor').html("<font color='yellow'>" + array[i].substring(index, index+1)  + "</font>" );
+        $('#live2').html("<font color='yellow'>" + array[i].substring(index+1, array[i].length)  + "</font>" );
+        if(command==array[i].substring(0, array[i].length))
+        {
+          $('.cursor').html('&nbsp');
+        }
     }
   }
 
