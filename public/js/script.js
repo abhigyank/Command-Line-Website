@@ -52,6 +52,7 @@ $('textarea').keyup(function(e) {
       if(counter==array.length -1){
         temp_command = command;
       }
+      
       $('textarea').val(array[counter]);
       command = array[counter];
       counter-=1;
@@ -261,11 +262,15 @@ $('textarea').keyup(function(e) {
         if($('textarea').prop("selectionStart") == command.length)
           $('#live2').html('');
     }
-    else {
+   else {
         $('#live').html(command);
         var index = $('textarea').prop("selectionStart");
-        $('.cursor').html(command[index]);
-        $('#live2').html("<font color='yellow'>" + array[i].substring(index, array[i].length)  + "</font>" );
+        $('.cursor').html("<font color='yellow'>" + array[i].substring(index, index+1)  + "</font>" );
+        $('#live2').html("<font color='yellow'>" + array[i].substring(index+1, array[i].length)  + "</font>" );
+        if(((command.length==1) && (e.which ==8)) || command==array[i].substring(0, array[i].length))
+        {
+          $('.cursor').html('&nbsp');
+        }
     }
   }
 
