@@ -46,6 +46,17 @@ module.exports = function(app, passport){
 	// Receives an ajax get request from the client site to create a folder
 	// The request will contain the path where to create folder and usernam
 	app.get('/mkdir', function(req, res) {
+		if(req.isAuthenticated())
+		{
+			makeDir.makeDir(req.query.nameFolder,req.query.username);
+      	return res.send("4");
+		}
+		else
+		{
+			return res.send({ value : '1' });
+			return res.send("0");
+		}
+		
 		// call makeDir function here with appropriate function paramters from req
     });
 
