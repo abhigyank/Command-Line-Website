@@ -131,48 +131,58 @@ $('textarea').keyup(function(e) {
     }
     else if(command.includes("mkdir")==true)
     {
+      if(command.split(" ").length == 1) {
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
+        reset();
+        return;
+      }
       $.ajax({
         type:'get',
         datatype :'json',
-        data:{nameFolder: command.split(" ")[1].trim(), username : username},    
+        data:{nameFolder: command.split(" ")[1].trim()},
         url:"/mkdir"
         }).done(function(data){
-          if(data.value != 1)
+          if(data.value == 1)
           {
               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-          reset();
+              reset();
+          }
+          else if(data.value == -1) {
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + data.error + '</span></div></div><br>');
+              reset();
           }
           else 
           {
               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first.</span></div></div><br>');
-          reset();
+              reset();
           }
           
         }).fail(function(jqXHR,exception){
-       $('.trminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-                
-        var msg = '';
-        if (jqXHR.status === 0) {
-            msg = 'Not connect.\n Verify Network.';
-        } else if (jqXHR.status == 404) {
-            msg = 'Requested page not found. [404]';
-        } else if (jqXHR.status == 500) {
-            msg = 'Internal Server Error [500].';
-        } else if (exception === 'parsererror') {
-            msg = 'Requested JSON parse failed.';
-        } else if (exception === 'timeout') {
-            msg = 'Time out error.';
-        } else if (exception === 'abort') {
-            msg = 'Ajax request aborted.';
-        } else {
-            msg = 'Uncaught Error.\n' + jqXHR.responseText;
-          if (data) console.error(data)
-          else console.log('Success!')
-          }
-      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot create directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
-          reset();
-      });
+           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');         
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              if (data) console.error(data)
+              else console.log('Success!')
+              }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot create directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
+              reset();
+          });
     }
 
     else if(command=="signup"){
