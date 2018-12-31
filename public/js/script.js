@@ -94,18 +94,26 @@ $('textarea').keyup(function(e) {
     return;
   }
 
-  else if(e.which==37 || e.which==39){
+  else if(e.which==37 || e.which==39){ 
     var index = $('textarea').prop("selectionStart");
     var prev = command.substring(0, index);
     $('#live').html(prev);
 
-    if(prev==command){
+    if((prev==command) && (i == -1 || array.length == 0)){
       $('.cursor').html('&nbsp');
       $('#live2').html('');
     }
-    else{
+    else if((prev!=command) && (i == -1 || array.length == 0)){
       $('.cursor').html(command[index]);
       $('#live2').html(command.substring(index+1, command.length))
+    }
+    else if((i!=1 || array.length != 0) && (command!=array[i].substring(0, array[i].length)) && (e.which==39))
+    {
+      $('textarea').val(array[i]);
+      command = array[i];
+      $('#live').html(command);
+      $('#live2').html('');
+      $('.cursor').html('&nbsp');
     }
     return;
   }
