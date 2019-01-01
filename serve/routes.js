@@ -1,5 +1,6 @@
 const  makeDir  = require('./helpers/folder.js');
-
+var fs = require('fs');
+var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -43,24 +44,49 @@ module.exports = function(app, passport){
 		}
 	});
 
+	// Receives an ajax get request from the client site to list the files in a directory
+	// The request will contain the path where files has to list.
+	app.get('/ls', function(req, res) {
+		var path = "./user_data" +  "/"+ req.user.local.email + "/" + req.query.directory;
+		fs.readdir(path ,function(err,items)
+		{
+			//return list of files contained in a folder.
+    		return  res.send( { value : items });
+		})
+
+    });
+
 	// Receives an ajax get request from the client site to create a folder
 	// The request will contain the path where to create folder
 	app.get('/mkdir', function(req, res) {
 		if(req.isAuthenticated())
 		{
-			var response = makeDir.makeDir(req.query.nameFolder,req.user.local.email);
-	      	if(response.constructor === Error){
-	      		res.send({
-	      			value: -1,
-	      			error: response.message
-	      		})
+			
+			if(!req.query.nameFolder.match(format)){
+
+				var path_folder =   req.query.directory + '/' + req.query.nameFolder;
+
+				// call makeDir function here with appropriate function paramters from req
+				var response = makeDir.makeDir(path_folder,req.user.local.email);
+	      		if(response.constructor === Error){
+	      			res.send({
+	      				value: -1,
+	      				error: response.message
+	      			})
+	      		}
+	      		else {
+	      			res.send({
+	      				value: 1
+	      			});
+	      		}
 	      	}
-	      	else {
-	      		res.send({
-	      			value: 1
-	      		});
-	      	}
-		}
+	      	else
+	      	{
+	      		res.send({ 
+					value : 2 
+				});
+	    	}
+		}		
 		else
 		{
 			res.send({ 
@@ -69,8 +95,34 @@ module.exports = function(app, passport){
 		}
 		
 		// call makeDir function here with appropriate function paramters from req
+			
+			
     });
 
+    app.get('/cd', function(req, res) {
+			var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + req.query.nameofdir;
+			if(!req.query.nameofdir.match(format)){
+				if(fs.existsSync(path_folder))
+				{
+					
+					res.send({value : 1});
+				}
+				else
+				{
+					
+					res.send({value : -1});	
+				}
+				
+			}
+			else
+			{
+				res.send({
+					value : 0
+				})
+			}
+			
+		});
+  
 	app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
