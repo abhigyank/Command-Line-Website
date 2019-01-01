@@ -95,6 +95,7 @@ $('textarea').keyup(function(e) {
   }
 
   else if(e.which==37 || e.which==39){ 
+
     var index = $('textarea').prop("selectionStart");
     var prev = command.substring(0, index);
     $('#live').html(prev);
@@ -105,7 +106,7 @@ $('textarea').keyup(function(e) {
     }
     else if((prev!=command) && (i == -1 || array.length == 0)){
       $('.cursor').html(command[index]);
-      $('#live2').html(command.substring(index+1, command.length))
+      $('#live2').html(command.substring(index+1, command.length));
     }
     else if((i!=1 || array.length != 0) && (command!=array[i].substring(0, array[i].length)) && (e.which==39))
     {
@@ -113,6 +114,9 @@ $('textarea').keyup(function(e) {
       command = array[i];
       $('#live').html(command);
       $('#live2').html('');
+      $('.cursor').html('&nbsp');
+    }
+    else if(prev == command) {
       $('.cursor').html('&nbsp');
     }
     return;
