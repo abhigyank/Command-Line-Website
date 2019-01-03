@@ -94,18 +94,30 @@ $('textarea').keyup(function(e) {
     return;
   }
 
-  else if(e.which==37 || e.which==39){
+  else if(e.which==37 || e.which==39){ 
+
     var index = $('textarea').prop("selectionStart");
     var prev = command.substring(0, index);
     $('#live').html(prev);
 
-    if(prev==command){
+    if((prev==command) && (i == -1 || array.length == 0)){
       $('.cursor').html('&nbsp');
       $('#live2').html('');
     }
-    else{
+    else if((prev!=command) && (i == -1 || array.length == 0)){
       $('.cursor').html(command[index]);
-      $('#live2').html(command.substring(index+1, command.length))
+      $('#live2').html(command.substring(index+1, command.length));
+    }
+    else if((i!=1 || array.length != 0) && (command!=array[i].substring(0, array[i].length)) && (e.which==39))
+    {
+      $('textarea').val(array[i]);
+      command = array[i];
+      $('#live').html(command);
+      $('#live2').html('');
+      $('.cursor').html('&nbsp');
+    }
+    else if(prev == command) {
+      $('.cursor').html('&nbsp');
     }
     return;
   }
@@ -124,9 +136,65 @@ $('textarea').keyup(function(e) {
        login - to login into the terminal<br>\
        clear - to clear screen<br>\
        logout - to logout of session<br>\
-       press ctrl + c - to abort a currently running process\
+       press ctrl + c - to abort a currently running process<br>\
+       mkdir - to create directory or folder<br>\
        </span></div></div><br>');
       reset();
+    }
+    else if(command.includes("mkdir")==true)
+    {
+      if(command.split(" ").length == 1) {
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
+        reset();
+        return;
+      }
+      $.ajax({
+        type:'get',
+        datatype :'json',
+        data:{nameFolder: command.split(" ")[1].trim()},
+        url:"/mkdir"
+        }).done(function(data){
+          if(data.value == 1)
+          {
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              reset();
+          }
+          else if(data.value == -1) {
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + data.error + '</span></div></div><br>');
+              reset();
+          }
+          else 
+          {
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first.</span></div></div><br>');
+              reset();
+          }
+          
+        }).fail(function(jqXHR,exception){
+           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');         
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              if (data) console.error(data)
+              else console.log('Success!')
+              }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot create directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
+              reset();
+          });
     }
 
     else if(command=="signup"){
