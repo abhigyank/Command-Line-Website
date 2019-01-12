@@ -1,6 +1,8 @@
 const  makeDir  = require('./helpers/folder.js');
 var fs = require('fs');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+const deleteDir = require('./helpers/delfolder.js');
+
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -8,7 +10,7 @@ module.exports = function(app, passport){
 			user: req.user
 		});
 	});
-	 app.get('/signup', function(req, res) {
+	app.get('/signup', function(req, res) {
         // render the page and pass in any flash data if it exists
         if(!req.isAuthenticated()){
 	        res.render('signup', { errors: req.session.messages || [] });
@@ -61,6 +63,7 @@ module.exports = function(app, passport){
 	app.get('/mkdir', function(req, res) {
 		if(req.isAuthenticated())
 		{
+<<<<<<< 3a93ff45947d53034322435232d03f5ce394e680
 			
 			if(!req.query.nameFolder.match(format)){
 
@@ -79,6 +82,19 @@ module.exports = function(app, passport){
 	      				value: 1
 	      			});
 	      		}
+=======
+			var response = makeDir.makeDir(req.query.nameFolder,req.user.local.email);
+	      	if(response.constructor === Error){
+	      		res.send({
+	      			value: -1,
+	      			error: response.message
+	      		})
+	      	}
+	      	else{
+	      		res.send({
+	      			value: 1
+	      		});
+>>>>>>> added delete folder functionality
 	      	}
 	      	else
 	      	{
@@ -126,6 +142,32 @@ module.exports = function(app, passport){
 	app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
+    });
+
+    app.get('/delete', function(req, res) {
+		if(req.isAuthenticated())
+		{
+			var response = deleteDir.deleteDir(req.query.nameFolder,req.user.local.email);
+	      	if(response.constructor === Error){
+	      		res.send({
+	      			value: -1,
+	      			error: response.message
+	      		})
+	      	}
+	      	else {
+	      		res.send({
+	      			value: 1
+	      		});
+	      	}
+		}
+		else
+		{
+			res.send({ 
+				value : 0
+			});
+		}
+		
+		// call deleteDir function here with appropriate function paramters from req
     });
 };
 
