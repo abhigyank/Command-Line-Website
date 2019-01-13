@@ -156,7 +156,6 @@ $('textarea').keyup(function(e) {
 
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
-        return;
       }
       $.ajax({
         type:'get',
@@ -270,7 +269,7 @@ $('textarea').keyup(function(e) {
       }
       else
       {
-          if((command.split(" ").length == 1))
+          if((command.split(" ").length == 1) || command.split(" ")[1].trim() == "")
           {
             
             if(directory == "")
@@ -282,12 +281,23 @@ $('textarea').keyup(function(e) {
             $('#root').html('root@' + username + ': ~'  + '$ ');
             $('textarea').focus();
             reset();
-            return;
           }
           else
           {
             var name = command.split(" ")[1].trim();
-            if(name=="..")
+            if(name==".") {
+        	  if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              if(directory=="")
+                $('#root').html('root@' + username + ': ~' + directory  + '$ ');
+              else
+                $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
+                $('textarea').focus();
+              reset();
+            } 
+            else if(name=="..")
             {
               var bits = directory.split("/");
               var changeDir = "";
@@ -311,7 +321,6 @@ $('textarea').keyup(function(e) {
                 $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
                 $('textarea').focus();
               reset();
-
             }
             else
             {
@@ -398,8 +407,6 @@ $('textarea').keyup(function(e) {
             $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>cd: cannot change the directory "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
             reset();
           });
-
-          return ;
         }
       }}
            
@@ -459,7 +466,6 @@ $('textarea').keyup(function(e) {
           reset();
       });
       }
-      return;
     }
 
     else if(command=="logout"){
