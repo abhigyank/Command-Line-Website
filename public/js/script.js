@@ -324,11 +324,15 @@ $('textarea').keyup(function(e) {
             }
             else
             {
+              if(name[0]=="." && name[1]=="/" && name[2]!="/")
+              {
+                name =  name.substr(2);
+              }
 
               $.ajax({
                 type:'get',
                 datatype :'json',
-                data:{nameofdir: command.split(" ")[1].trim(),directory : directory},
+                data:{nameofdir: name,directory : directory},
                 url:"/cd"
               }).done(function(data){
                 if(data.value == 1)
