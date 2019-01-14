@@ -2,6 +2,7 @@ const  makeDir  = require('./helpers/folder.js');
 var fs = require('fs');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 
+
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
 		res.render('index', {
@@ -109,8 +110,8 @@ module.exports = function(app, passport){
 
     app.get('/cd', function(req, res) {
     		var foldername = req.query.nameofdir;
-    		
-              if((foldername[0]=="/") || (foldername[0]=="." && foldername[1]=="/" && foldername[2]=="/"))
+    		var n = -1;
+              if((foldername[0]=="/"))
               {
                	res.send({
 					value : 0
@@ -119,29 +120,57 @@ module.exports = function(app, passport){
               }
               else
               {
-              		
-              		var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
-					if(!req.query.nameofdir.match(format)){
-						if(fs.existsSync(path_folder))
-						{
+              		while(foldername.includes("./")==true)
+              		{
+              			var index = foldername.indexOf("./");
+              			if(index !=0 && foldername[index-1]!="/")
+              			{
+              				n=0;
+              				break;
+              			}
+                		foldername = foldername.replace("./",'');
+              		}
+              		while(foldername.includes("//")==true)
+                		foldername = foldername.replace("//","/");
+              		if(foldername[0]=="/")
+                		foldername = foldername.substr(1);
+
+                	if(n==0)
+                	{
+                		res.send({
+							value : -1,
+ 							string:foldername
+              			})
+                	}	
+                	else
+                	{
+                		var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
+						if(!req.query.nameofdir.match(format)){
+							if(fs.existsSync(path_folder))
+							{
 					
-							res.send({value : 1});
-						}
+								res.send({
+									value : 1,
+									string : foldername
+								})
+							}
+							else
+							{
+					
+								res.send({
+									value : -1,
+									string : foldername
+								});	
+							}	
+						}	
 						else
 						{
-					
-							res.send({value : -1});	
-						}	
-					}	
-					else
-					{
-						res.send({
-							value : 0
-						})
-					}
-              
+							res.send({
+								value : 0
+							})
+						}
+                	}
           	}
-			
 			
 		});
   

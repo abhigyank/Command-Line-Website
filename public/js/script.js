@@ -324,10 +324,6 @@ $('textarea').keyup(function(e) {
             }
             else
             {
-              if(name[0]=="." && name[1]=="/" && name[2]!="/")
-              {
-                name =  name.substr(2);
-              }
 
               $.ajax({
                 type:'get',
@@ -341,13 +337,13 @@ $('textarea').keyup(function(e) {
                   {  
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    directory = directory + name;
+                    directory = directory + data.string;
                   }
                   else
                   {
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    directory = directory +'/' + name;                
+                    directory = directory +'/' + data.string;                
                   }
 
                   $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
@@ -359,13 +355,13 @@ $('textarea').keyup(function(e) {
                   {
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name+": No such file or directory" +'</span></div></div><br>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  data.string+": No such file or directory" +'</span></div></div><br>');
                   }
                   else
                   {
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name+": No such file or directory" +'</span></div></div><br>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" + data.string +": No such file or directory" +'</span></div></div><br>');
                   }
                   reset();
                 }
@@ -410,7 +406,7 @@ $('textarea').keyup(function(e) {
               }
             $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>cd: cannot change the directory "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
             reset();
-          });
+          }); 
         }
       }}
            
