@@ -7,6 +7,8 @@ var password = 0;
 var em = "";
 var username = 'guest';
 var logged = 0;
+var directory = "";
+var nameofdir ="";
 $(document).ready(function() {
   $('#root').html('root@' + username + ': ~$ ');
   $('textarea').focus();
@@ -138,31 +140,55 @@ $('textarea').keyup(function(e) {
        logout - to logout of session<br>\
        press ctrl + c - to abort a currently running process<br>\
        mkdir - to create directory or folder<br>\
+       cd - to change the directory<br>\
+       ls - to list the files in adirectory<br>\
        </span></div></div><br>');
       reset();
     }
-    else if(command.includes("mkdir")==true)
+
+    else if(command.split(" ")[0].trim()=="mkdir")
     {
       if(command.split(" ").length == 1) {
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        if(directory=="")
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        else
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
-        return;
       }
       $.ajax({
         type:'get',
         datatype :'json',
-        data:{nameFolder: command.split(" ")[1].trim()},
+        data:{nameFolder: command.split(" ")[1].trim(),directory : directory},
         url:"/mkdir"
         }).done(function(data){
           if(data.value == 1)
           {
-              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' +  '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+
               reset();
           }
           else if(data.value == -1) {
-              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + data.error + '</span></div></div><br>');
+              reset();
+          }
+          else if(data.value == 2)
+          {
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' +"cannot create a directory : permission denied" + '</span></div></div><br>');
               reset();
           }
           else 
@@ -214,6 +240,8 @@ $('textarea').keyup(function(e) {
       return;
     }
 
+
+
     else if(command=="login"){
 
       if(!logged){
@@ -228,6 +256,215 @@ $('textarea').keyup(function(e) {
         $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Already logged in.</span></div></div><br>');
         reset();
+      }
+    }
+
+    else if(command.split(" ")[0].trim()=="cd")
+    {
+      if(!logged)
+      {
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first.</div><br>');
+          reset();  
+      }
+      else
+      {
+          if((command.split(" ").length == 1) || command.split(" ")[1].trim() == "")
+          {
+            
+            if(directory == "")
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+            else
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+            
+            directory ="";
+            $('#root').html('root@' + username + ': ~'  + '$ ');
+            $('textarea').focus();
+            reset();
+          }
+          else
+          {
+            var name = command.split(" ")[1].trim();
+            if(name==".") {
+        	  if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              if(directory=="")
+                $('#root').html('root@' + username + ': ~' + directory  + '$ ');
+              else
+                $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
+                $('textarea').focus();
+              reset();
+            } 
+            else if(name=="..")
+            {
+              var bits = directory.split("/");
+              var changeDir = "";
+              for(var count =0;count<bits.length-1;count++)
+              {
+                if(changeDir=="")
+                  changeDir =  bits[count];
+                else
+                  changeDir = changeDir + "/" + bits[count];
+
+              }            
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              directory=changeDir;
+              if(directory=="")
+                $('#root').html('root@' + username + ': ~' + directory  + '$ ');
+              else
+                $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
+                $('textarea').focus();
+              reset();
+            }
+            else
+            {
+
+              $.ajax({
+                type:'get',
+                datatype :'json',
+                data:{nameofdir: command.split(" ")[1].trim(),directory : directory},
+                url:"/cd"
+              }).done(function(data){
+                if(data.value == 1)
+                {
+                  if(directory == "")
+                  {  
+
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+                    directory = directory + name;
+                  }
+                  else
+                  {
+
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+                    directory = directory +'/' + name;                
+                  }
+
+                  $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
+                  $('textarea').focus();
+                  reset();                        
+                }
+                else if(data.value == -1) {
+                  if(directory=="")
+                  {
+
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name+": No such file or directory" +'</span></div></div><br>');
+                  }
+                  else
+                  {
+
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name+": No such file or directory" +'</span></div></div><br>');
+                  }
+                  reset();
+                }
+                else 
+                {
+                  if(directory=="")
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+                  else
+                      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+                  
+                  $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>cannot change directory : Permission denied</span></div></div><br>');
+                  if(directory=="")
+                    $('#root').html('root@' + username + ': ~' + directory +  '$ ');
+                  else
+                    $('#root').html('root@' + username + ': ~/' + directory +  '$ ');
+                  $('textarea').focus();
+                  reset();
+                }          
+              }).fail(function(jqXHR,exception){
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');         
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');         
+
+              var msg = '';
+              if (jqXHR.status === 0) {
+                msg = 'Not connect.\n Verify Network.';
+              } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found. [404]';
+              } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+              } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+              } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+              } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+              } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              if (data) console.error(data)
+              else console.log('Success!')
+              }
+            $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>cd: cannot change the directory "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
+            reset();
+          });
+        }
+      }}
+           
+    }
+
+    else if(command=="ls"){
+
+      if(!logged)
+      {
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first</span></div></div><br>');
+        reset();
+      }
+      else 
+      {        
+        $.ajax({
+        type:'get',
+        datatype :'json',
+        data:{ username : username , directory : directory},   
+        url:"/ls"
+        }).done(function(data){
+            if(directory=="")
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory+ '$ </span><span>' + command + '</span></div></div>'); 
+            else  
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory+ '$ </span><span>' + command + '</span></div></div>'); 
+
+            for(num = 0;num < data.value.length ;num++)
+            {
+                $('.terminal-output').append('<div class="folder"><div style="width: 100%;"><span> ' + data.value[num] + '</span></div></div>');
+
+            }              
+            $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span><br></span></div></div>');            
+            reset();
+
+        }).fail(function(jqXHR,exception){
+            $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+                
+            var msg = '';
+            if (jqXHR.status === 0) {
+              msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+              msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+              msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+              msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') { 
+              msg = 'Time out error.';
+            } else if (exception === 'abort') {
+              msg = 'Ajax request aborted.';
+            } else {
+              msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            if (data) console.error(data)
+            else console.log('Success!')
+          }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>ls: cannot list files "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
+          reset();
+      });
       }
     }
 
@@ -248,7 +485,13 @@ $('textarea').keyup(function(e) {
     }
 
     else{
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        if(directory=="")
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+        else if(directory=="/")
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+        else
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>No command \''+command+'\' found.</span></div></div><br>');
         $('textarea').val('');
         $('#live').html('');
