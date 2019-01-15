@@ -223,7 +223,6 @@ $('textarea').keyup(function(e) {
               reset();
           });
     }
-
     else if(command.includes("rm -r")==true)
     {
         if(command.split(" ").length == 1) {
@@ -231,7 +230,7 @@ $('textarea').keyup(function(e) {
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm -r: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
         return;
-      }
+       }
       $.ajax({
         type:'get',
         datatype :'json',
@@ -241,11 +240,16 @@ $('textarea').keyup(function(e) {
           if(data.value == 1)
           {
               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-              reset();
+               reset();
           }
           else if(data.value == -1) {
               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + data.error + '</span></div></div><br>');
+              reset();
+          }
+          else if(data.value == 2) {
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Folder does not exist.</span></div></div><br>');
               reset();
           }
           else if(data.value == 0) 

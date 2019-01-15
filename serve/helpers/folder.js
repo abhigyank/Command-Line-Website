@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fse = require('fs-extra');
 
 const makeDir = function myFunction(directory,username){
 
@@ -22,8 +23,23 @@ const makeDir = function myFunction(directory,username){
   
 }
 
-
+const deleteDir = function myFunction(directory,username){
+  
+  try{
+      if(!fse.existsSync('./user_data/' + username + "/" +  directory))
+      {
+        return false;
+      }
+     fse.removeSync('./user_data/' + username + "/" +  directory);
+     return true;
+  }
+  catch (e) {
+    return (e);
+  }
+  
+}
 
 module.exports = {
-  makeDir
+  makeDir,
+  deleteDir
 }

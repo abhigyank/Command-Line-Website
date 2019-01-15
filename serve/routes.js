@@ -1,8 +1,6 @@
-const  makeDir  = require('./helpers/folder.js');
+const  DirFunctions  = require('./helpers/folder.js');
 var fs = require('fs');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-const deleteDir = require('./helpers/delfolder.js');
-
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -63,14 +61,13 @@ module.exports = function(app, passport){
 	app.get('/mkdir', function(req, res) {
 		if(req.isAuthenticated())
 		{
-<<<<<<< 3a93ff45947d53034322435232d03f5ce394e680
 			
 			if(!req.query.nameFolder.match(format)){
 
 				var path_folder =   req.query.directory + '/' + req.query.nameFolder;
 
 				// call makeDir function here with appropriate function paramters from req
-				var response = makeDir.makeDir(path_folder,req.user.local.email);
+				var response = DirFunctions.makeDir(path_folder,req.user.local.email);
 	      		if(response.constructor === Error){
 	      			res.send({
 	      				value: -1,
@@ -82,19 +79,6 @@ module.exports = function(app, passport){
 	      				value: 1
 	      			});
 	      		}
-=======
-			var response = makeDir.makeDir(req.query.nameFolder,req.user.local.email);
-	      	if(response.constructor === Error){
-	      		res.send({
-	      			value: -1,
-	      			error: response.message
-	      		})
-	      	}
-	      	else{
-	      		res.send({
-	      			value: 1
-	      		});
->>>>>>> added delete folder functionality
 	      	}
 	      	else
 	      	{
@@ -110,7 +94,7 @@ module.exports = function(app, passport){
 			});
 		}
 		
-		// call makeDir function here with appropriate function paramters from req
+		// call makeDir function here with appropriate function parameters from req
 			
 			
     });
@@ -147,11 +131,16 @@ module.exports = function(app, passport){
     app.get('/delete', function(req, res) {
 		if(req.isAuthenticated())
 		{
-			var response = deleteDir.deleteDir(req.query.nameFolder,req.user.local.email);
+			var response = DirFunctions.deleteDir(req.query.nameFolder,req.user.local.email);
 	      	if(response.constructor === Error){
 	      		res.send({
 	      			value: -1,
 	      			error: response.message
+	      		})
+	      	}
+	      	else if(!response){
+	      		res.send({
+	      			value: 2
 	      		})
 	      	}
 	      	else {
