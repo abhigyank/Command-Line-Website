@@ -1,4 +1,4 @@
-const  makeDir  = require('./helpers/folder.js');
+const  DirFunctions  = require('./helpers/folder.js');
 var fs = require('fs');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 
@@ -9,7 +9,7 @@ module.exports = function(app, passport){
 			user: req.user
 		});
 	});
-	 app.get('/signup', function(req, res) {
+	app.get('/signup', function(req, res) {
         // render the page and pass in any flash data if it exists
         if(!req.isAuthenticated()){
 	        res.render('signup', { errors: req.session.messages || [] });
@@ -62,39 +62,31 @@ module.exports = function(app, passport){
 	app.get('/mkdir', function(req, res) {
 		if(req.isAuthenticated())
 		{
-			if(req.query.nameFolder[0]=="/")
-			{
-				res.send({ 
+			
+			if(!req.query.nameFolder.match(format)){
+
+				var path_folder =   req.query.directory + '/' + req.query.nameFolder;
+
+				// call makeDir function here with appropriate function paramters from req
+				var response = DirFunctions.makeDir(path_folder,req.user.local.email);
+	      		if(response.constructor === Error){
+	      			res.send({
+	      				value: -1,
+	      				error: response.message
+	      			})
+	      		}
+	      		else {
+	      			res.send({
+	      				value: 1
+	      			});
+	      		}
+	      	}
+	      	else
+	      	{
+	      		res.send({ 
 					value : 2 
 				});
-			}	
-			else
-			{
-				if(!req.query.nameFolder.match(format)){
-
-					var path_folder =   req.query.directory + '/' + req.query.nameFolder;
-
-					// call makeDir function here with appropriate function paramters from req
-					var response = makeDir.makeDir(path_folder,req.user.local.email);
-	      			if(response.constructor === Error){
-	      				res.send({
-	      					value: -1,
-	      					error: response.message
-	      				})
-	      			}
-	      			else {
-	      				res.send({
-	      					value: 1
-	      				});
-	      			}
-	      		}		
-	      		else
-	      		{
-	      			res.send({ 
-					value : 2 
-					});
-	    		}
-			}
+	    	}
 		}		
 		else
 		{
@@ -103,9 +95,8 @@ module.exports = function(app, passport){
 			});
 		}
 		
-		// call makeDir function here with appropriate function paramters from req
-			
-			
+		// call makeDir function here with appropriate function parameters from req
+		
     });
 
     app.get('/cd', function(req, res) {
@@ -186,6 +177,45 @@ module.exports = function(app, passport){
 	app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
+    });
+
+    app.get('/delete', function(req, res) {
+		if(req.isAuthenticated())
+		{
+			if(!req.query.nameFolder.match(format)){
+				var path_folder =   req.query.directory + '/' + req.query.nameFolder;
+				var response = DirFunctions.deleteDir(path_folder, req.user.local.email);
+		      	if(response.constructor === Error){
+		      		res.send({
+		      			value: -1,
+		      			error: response.message
+		      		})
+		      	}
+		      	else if(!response){
+		      		res.send({
+		      			value: 2
+		      		})
+		      	}
+		      	else {
+		      		res.send({
+		      			value: 1
+		      		});
+		      	}
+		    }
+		    else{
+		    	res.send({
+		      		value: 3
+		      	});
+		    }
+		}
+		else
+		{
+			res.send({ 
+				value : 0
+			});
+		}
+		
+		// call deleteDir function here with appropriate function paramters from req
     });
 };
 
