@@ -158,11 +158,12 @@ $('textarea').keyup(function(e) {
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
       }
-      $.ajax({
-        type:'get',
-        datatype :'json',
-        data:{nameFolder: command.split(" ")[1].trim(), directory : directory},
-        url:"/mkdir"
+      else {
+        $.ajax({
+          type:'get',
+          datatype :'json',
+          data:{nameFolder: command.split(" ")[1].trim(), directory : directory},
+          url:"/mkdir"
         }).done(function(data){
           if(data.value == 1)
           {
@@ -198,7 +199,7 @@ $('textarea').keyup(function(e) {
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first.</span></div></div><br>');
               reset();
           }
-          
+            
         }).fail(function(jqXHR,exception){
            $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');         
             var msg = '';
@@ -221,23 +222,25 @@ $('textarea').keyup(function(e) {
               }
           $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot create directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
               reset();
-          });
+        });
+      }
     }
     else if(command.includes("rm -r")==true && command.split(" ")[0] == "rm" && command.split(" ")[1] == "-r")
     {
-        if(command.split(" ").length == 2) {
+      if(command.split(" ").length == 2) {
         if(directory=="")
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
          else
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm -r: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
-       }
-      $.ajax({
-        type:'get',
-        datatype :'json',
-        data:{nameFolder: command.split(" ")[2].trim(), directory: directory},
-        url:"/delete"
+      }
+      else {
+        $.ajax({
+          type:'get',
+          datatype :'json',
+          data:{nameFolder: command.split(" ")[2].trim(), directory: directory},
+          url:"/delete"
         }).done(function(data){
           if(data.value == 1)
           {   
@@ -304,10 +307,9 @@ $('textarea').keyup(function(e) {
               }
           $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot delete directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
               reset();
-          });
+        });
+      }
     }
-
-
     else if(command=="signup"){
 
       if(logged)
@@ -324,9 +326,6 @@ $('textarea').keyup(function(e) {
       }
       return;
     }
-
-
-
     else if(command=="login"){
 
       if(!logged){
@@ -343,7 +342,6 @@ $('textarea').keyup(function(e) {
         reset();
       }
     }
-
     else if(command.split(" ")[0].trim()=="cd")
     {
       if(!logged)
