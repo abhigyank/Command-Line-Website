@@ -141,7 +141,8 @@ $('textarea').keyup(function(e) {
        press ctrl + c - to abort a currently running process<br>\
        mkdir - to create directory or folder<br>\
        cd - to change the directory<br>\
-       ls - to list the files in adirectory<br>\
+       rm -r - to delete an existing directory or folder<br>\
+       ls - to list the files in a directory<br>\
        </span></div></div><br>');
       reset();
     }
@@ -151,7 +152,7 @@ $('textarea').keyup(function(e) {
       if(command.split(" ").length == 1) {
         if(directory=="")
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-        else
+         else
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
 
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
@@ -160,7 +161,7 @@ $('textarea').keyup(function(e) {
       $.ajax({
         type:'get',
         datatype :'json',
-        data:{nameFolder: command.split(" ")[1].trim(),directory : directory},
+        data:{nameFolder: command.split(" ")[1].trim(), directory : directory},
         url:"/mkdir"
         }).done(function(data){
           if(data.value == 1)
@@ -186,7 +187,7 @@ $('textarea').keyup(function(e) {
               if(directory=="")
                 $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
               else
-                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
               
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' +"cannot create a directory : permission denied" + '</span></div></div><br>');
               reset();
@@ -202,7 +203,7 @@ $('textarea').keyup(function(e) {
            $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');         
             var msg = '';
             if (jqXHR.status === 0) {
-                msg = 'Not connect.\n Verify Network.';
+                msg = 'Not connected.\n Verify Network.';
             } else if (jqXHR.status == 404) {
                 msg = 'Requested page not found. [404]';
             } else if (jqXHR.status == 500) {
@@ -222,6 +223,90 @@ $('textarea').keyup(function(e) {
               reset();
           });
     }
+    else if(command.includes("rm -r")==true && command.split(" ")[0] == "rm" && command.split(" ")[1] == "-r")
+    {
+        if(command.split(" ").length == 2) {
+        if(directory=="")
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+         else
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm -r: missing operand &ltfolder name&gt </span></div></div><br>');
+        reset();
+       }
+      $.ajax({
+        type:'get',
+        datatype :'json',
+        data:{nameFolder: command.split(" ")[2].trim(), directory: directory},
+        url:"/delete"
+        }).done(function(data){
+          if(data.value == 1)
+          {   
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' +  '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+               reset();
+          }
+          else if(data.value == -1) {
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + data.error + '</span></div></div><br>');
+              reset();
+          }
+          else if(data.value == 2) {
+             if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm: cannot remove '+ '\''+ command.split(" ")[2].trim() +'\'' +': No such file or directory</span></div></div><br>');
+             reset();
+          }
+          else if(data.value == 0) 
+          {
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first.</span></div></div><br>');
+              reset();
+          }
+          else
+          {
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm: cannot remove '+ '\''+ command.split(" ")[2].trim() +'\'' +': permission denied</span></div></div><br>');
+              reset();
+          }
+
+        }).fail(function(jqXHR,exception){
+           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');         
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Not connected.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              if (data) console.error(data)
+              else console.log('Success!')
+              }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: cannot delete directory "'+ command.slice(5) + '"  : ' + msg + '</span></div></div><br>');
+              reset();
+          });
+    }
+
 
     else if(command=="signup"){
 
@@ -233,9 +318,9 @@ $('textarea').keyup(function(e) {
       }
       else 
       {        
-         $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-      reset();
-      window.open('signup', '_blank');
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+       reset();
+       window.open('signup', '_blank');
       }
       return;
     }
@@ -577,7 +662,7 @@ $('textarea').keyup(function(e) {
           $('.cursor').html('&nbsp');
         }
     }
-   else {
+    else {
         $('#live').html(command);
         var index = $('textarea').prop("selectionStart");
         $('.cursor').html("<font color='yellow'>" + array[i].substring(index, index+1)  + "</font>" );
