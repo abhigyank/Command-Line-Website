@@ -223,7 +223,7 @@ $('textarea').keyup(function(e) {
               reset();
           });
     }
-    else if(command.includes("rm -r")==true)
+    else if(command.includes("rm -r")==true && command.split(" ")[0] == "rm" && command.split(" ")[1] == "-r")
     {
         if(command.split(" ").length == 2) {
         if(directory=="")
@@ -232,7 +232,6 @@ $('textarea').keyup(function(e) {
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm -r: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
-        return;
        }
       $.ajax({
         type:'get',
