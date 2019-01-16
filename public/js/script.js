@@ -141,8 +141,8 @@ $('textarea').keyup(function(e) {
        press ctrl + c - to abort a currently running process<br>\
        mkdir - to create directory or folder<br>\
        cd - to change the directory<br>\
-       ls - to list the files in adirectory<br>\
-       rm -r - to delete an existing folder<br>\
+       rm -r - to delete an existing directory or folder<br>\
+       ls - to list the files in a directory<br>\
        </span></div></div><br>');
       reset();
     }
