@@ -131,23 +131,31 @@ module.exports = function(app, passport){
     app.get('/delete', function(req, res) {
 		if(req.isAuthenticated())
 		{
-			var response = DirFunctions.deleteDir(req.query.nameFolder,req.user.local.email);
-	      	if(response.constructor === Error){
-	      		res.send({
-	      			value: -1,
-	      			error: response.message
-	      		})
-	      	}
-	      	else if(!response){
-	      		res.send({
-	      			value: 2
-	      		})
-	      	}
-	      	else {
-	      		res.send({
-	      			value: 1
-	      		});
-	      	}
+			if(!req.query.nameFolder.match(format)){
+				var path_folder =   req.query.directory + '/' + req.query.nameFolder;
+				var response = DirFunctions.deleteDir(path_folder, req.user.local.email);
+		      	if(response.constructor === Error){
+		      		res.send({
+		      			value: -1,
+		      			error: response.message
+		      		})
+		      	}
+		      	else if(!response){
+		      		res.send({
+		      			value: 2
+		      		})
+		      	}
+		      	else {
+		      		res.send({
+		      			value: 1
+		      		});
+		      	}
+		    }
+		    else{
+		    	res.send({
+		      		value: 3
+		      	});
+		    }
 		}
 		else
 		{

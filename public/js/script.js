@@ -152,7 +152,7 @@ $('textarea').keyup(function(e) {
       if(command.split(" ").length == 1) {
         if(directory=="")
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-        else
+         else
           $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
 
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>mkdir: missing operand &ltfolder name&gt </span></div></div><br>');
@@ -161,7 +161,7 @@ $('textarea').keyup(function(e) {
       $.ajax({
         type:'get',
         datatype :'json',
-        data:{nameFolder: command.split(" ")[1].trim(),directory : directory},
+        data:{nameFolder: command.split(" ")[1].trim(), directory : directory},
         url:"/mkdir"
         }).done(function(data){
           if(data.value == 1)
@@ -187,7 +187,7 @@ $('textarea').keyup(function(e) {
               if(directory=="")
                 $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
               else
-                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
               
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' +"cannot create a directory : permission denied" + '</span></div></div><br>');
               reset();
@@ -225,8 +225,11 @@ $('textarea').keyup(function(e) {
     }
     else if(command.includes("rm -r")==true)
     {
-        if(command.split(" ").length == 1) {
-        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        if(command.split(" ").length == 2) {
+        if(directory=="")
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+         else
+          $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
         $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm -r: missing operand &ltfolder name&gt </span></div></div><br>');
         reset();
         return;
@@ -234,28 +237,49 @@ $('textarea').keyup(function(e) {
       $.ajax({
         type:'get',
         datatype :'json',
-        data:{nameFolder: command.split(" ")[1].trim()},
+        data:{nameFolder: command.split(" ")[2].trim(), directory: directory},
         url:"/delete"
         }).done(function(data){
           if(data.value == 1)
-          {
-              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+          {   
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' +  '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
                reset();
           }
           else if(data.value == -1) {
-              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + data.error + '</span></div></div><br>');
               reset();
           }
           else if(data.value == 2) {
-              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
-              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>Folder does not exist.</span></div></div><br>');
-              reset();
+             if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm: cannot remove '+ '\''+ command.split(" ")[2].trim() +'\'' +': No such file or directory</span></div></div><br>');
+             reset();
           }
           else if(data.value == 0) 
           {
               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
               $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first.</span></div></div><br>');
+              reset();
+          }
+          else
+          {
+              if(directory=="")
+                $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + '$ </span><span>' + command + '</span></div></div>');
+              else
+               $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+              
+              $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>rm: cannot remove '+ '\''+ command.split(" ")[2].trim() +'\'' +': permission denied</span></div></div><br>');
               reset();
           }
 
@@ -283,6 +307,7 @@ $('textarea').keyup(function(e) {
               reset();
           });
     }
+
 
     else if(command=="signup"){
 
