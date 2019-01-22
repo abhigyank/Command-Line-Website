@@ -30,15 +30,16 @@ This wll install all the dependencies of this repository.
 
 ### Dependencies
 
-`bcrypt-nodejs: '0.0.3`
+`bcrypt-nodejs: '0.0.3`,
 `body-parser: ^1.17.2`,
 `cookie-parser: ^1.4.3`,
-`ejs": ^2.5.6`,
+`ejs: ^2.5.6`,
 `express: ^4.15.3`,
 `express-session: ^1.15.3`,
 `mongoose: ^4.10.5`,
 `passport: ^0.3.2`,
-`passport-local: ^1.0.0`
+`passport-local: ^1.0.0`,
+`fs-extra: ^7.0.1`
 
 # Building & Running
 
