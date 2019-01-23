@@ -429,7 +429,10 @@ $('textarea').keyup(function(e) {
                     directory = directory +'/' + data.string;                
                   }
 
-                  $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
+                  if(directory=="")
+                    $('#root').html('root@' + username + ': ~' + directory  + '$ ');
+                  else
+                    $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
                   $('textarea').focus();
                   reset();                        
                 }

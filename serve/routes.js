@@ -1,7 +1,8 @@
 const  DirFunctions  = require('./helpers/folder.js');
 var fs = require('fs');
+var path = require('path');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-
+var cmd=require('node-cmd');
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -102,74 +103,46 @@ module.exports = function(app, passport){
     app.get('/cd', function(req, res) {
     		//name of directory.
     		var foldername = req.query.nameofdir;
-    		var n = -1;
-              if((foldername[0]=="/"))
-              {
+            if((foldername[0]=="/"))
+            {
                	res.send({
 					value : 0
  
               	})
-              }
-              else
-              {
-              		//Removes "./" substr from foldername if this is not in the begining of foldername.
-              		while(foldername.includes("./")==true)
-              		{
-              			//variable to stored the index of substr "./" in foldername.
-              			var index = foldername.indexOf("./");
+            }
+            else
+            {
 
-              			//checks if substr "/" is just before "./" in foldername.
-              			//Ex- Desktop./<folder inside Desktop>
-              			if(index !=0 && foldername[index-1]!="/")
-              			{
-              				n=0;
-              				break;
-              			}
-                		foldername = foldername.replace("./",'');
-              		}
-
-              		//Removes extra "/" from foldername.
-              		while(foldername.includes("//")==true)
-                		foldername = foldername.replace("//","/");
-              		if(foldername[0]=="/")
-              			//Removes first character from foldername. 
-                		foldername = foldername.substr(1);
-
-                	if(n==0)
-                	{
-                		res.send({
+            	// Resolves the specified paths into an absolute path
+              	foldername = path.resolve("",foldername);
+              	foldername = foldername.substr(77,foldername.length);
+                var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
+				if(!req.query.nameofdir.match(format))
+				{
+					if(fs.existsSync(path_folder))
+					{
+					
+						res.send({
+							value : 1,
+							string : foldername
+						})
+					}
+					else
+					{
+					
+						res.send({
 							value : -1,
- 							string:foldername
-              			})
-                	}	
-                	else
-                	{
-                		var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
-						if(!req.query.nameofdir.match(format)){
-							if(fs.existsSync(path_folder))
-							{
-					
-								res.send({
-									value : 1,
-									string : foldername
-								})
-							}
-							else
-							{
-					
-								res.send({
-									value : -1,
-									string : foldername
-								});	
-							}	
-						}	
-						else
-						{
-							res.send({
-								value : 0
-							})
-						}
-                	}
+							string : foldername
+						});	
+					}	
+				}	
+				else
+				{
+					res.send({
+						value : 0
+					})
+				}
+                
           	}
 			
 		});
