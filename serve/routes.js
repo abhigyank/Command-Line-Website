@@ -1,8 +1,7 @@
 const  DirFunctions  = require('./helpers/folder.js');
 var fs = require('fs');
-var path = require('path');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-var cmd=require('node-cmd');
+
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
