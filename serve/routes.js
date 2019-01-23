@@ -1,7 +1,7 @@
 const  DirFunctions  = require('./helpers/folder.js');
-var fs = require('fs');
+const fs = require('fs');
+const path_module = require('path');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -113,9 +113,10 @@ module.exports = function(app, passport){
             {
 
             	// Resolves the specified paths into an absolute path
-              	foldername = path.resolve("",foldername);
-              	foldername = foldername.substr(77,foldername.length);
-                var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
+              	foldername = path_module.resolve("",foldername);
+              	// (__dirname.length - 5 ) gives length of root directory removing serve (5 chars)
+              	foldername = foldername.substr(__dirname.length - 5,foldername.length);
+              	var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
 				if(!req.query.nameofdir.match(format))
 				{
 					if(fs.existsSync(path_folder))
@@ -140,10 +141,8 @@ module.exports = function(app, passport){
 					res.send({
 						value : 0
 					})
-				}
-                
-          	}
-			
+				}   
+          	}	
 		});
   
 	app.get('/logout', function(req, res) {
