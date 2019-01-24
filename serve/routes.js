@@ -111,13 +111,35 @@ module.exports = function(app, passport){
             }
             else
             {
+              	var default_path =  './user_data/' + req.user.local.email;
+              	var user_path =  default_path + '/' + req.query.directory +'/';
+
+            	// Initial Check whether path actualy exists or not
+            	if(!fs.existsSync(user_path + foldername)) {
+            		res.send({
+							value : -1,
+							string : foldername
+					});	
+					return;
+            	}
 
             	// Resolves the specified paths into an absolute path
-              	foldername = path_module.resolve("",foldername);
-              	// (__dirname.length - 5 ) gives length of root directory removing serve (5 chars)
-              	foldername = foldername.substr(__dirname.length - 5,foldername.length);
-              	var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + foldername;
-				if(!req.query.nameofdir.match(format))
+              	var path_folder =  path_module.resolve("", user_path, foldername);
+
+              	path_folder = './' + path_folder.substr(__dirname.length - 5,path_folder.length);
+
+              	// Trying to access above the user folder
+              	if(path_folder.length < default_path.length) {
+					res.send({
+						value : 0
+					})
+					return;
+              	}
+
+              	// Absolute directory path in user folder
+              	foldername = path_folder.substr(default_path.length + 1, path_folder.length);
+
+				if(!foldername.match(format) || foldername == "")
 				{
 					if(fs.existsSync(path_folder))
 					{
