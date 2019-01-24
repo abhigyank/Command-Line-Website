@@ -368,7 +368,7 @@ $('textarea').keyup(function(e) {
           else
           {
             var name = command.split(" ")[1].trim();
-            if(name==".") {
+            if(name=="." || name=="./") {
         	  if(directory=="")
                 $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
               else
@@ -380,7 +380,7 @@ $('textarea').keyup(function(e) {
                 $('textarea').focus();
               reset();
             } 
-            else if(name=="..")
+            else if(name==".." || name=="../")
             {
               var bits = directory.split("/");
               var changeDir = "";
@@ -411,7 +411,7 @@ $('textarea').keyup(function(e) {
               $.ajax({
                 type:'get',
                 datatype :'json',
-                data:{nameofdir: command.split(" ")[1].trim(),directory : directory},
+                data:{nameofdir: name,directory : directory},
                 url:"/cd"
               }).done(function(data){
                 if(data.value == 1)
@@ -420,16 +420,18 @@ $('textarea').keyup(function(e) {
                   {  
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    directory = directory + name;
+                    directory = data.string;
                   }
                   else
                   {
-
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    directory = directory +'/' + name;                
+                    directory = data.string;
                   }
 
-                  $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
+                  if(directory=="")
+                    $('#root').html('root@' + username + ': ~' + directory  + '$ ');
+                  else
+                    $('#root').html('root@' + username + ': ~/' + directory  + '$ ');
                   $('textarea').focus();
                   reset();                        
                 }
@@ -438,13 +440,13 @@ $('textarea').keyup(function(e) {
                   {
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name+": No such file or directory" +'</span></div></div><br>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name +": No such file or directory" +'</span></div></div><br>');
                   }
                   else
                   {
 
                     $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
-                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name+": No such file or directory" +'</span></div></div><br>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" + name +": No such file or directory" +'</span></div></div><br>');
                   }
                   reset();
                 }
@@ -489,7 +491,7 @@ $('textarea').keyup(function(e) {
               }
             $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>cd: cannot change the directory "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
             reset();
-          });
+          }); 
         }
       }}
            

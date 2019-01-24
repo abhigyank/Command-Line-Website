@@ -1,5 +1,6 @@
 const  DirFunctions  = require('./helpers/folder.js');
-var fs = require('fs');
+const fs = require('fs');
+const path_module = require('path');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 
 module.exports = function(app, passport){
@@ -95,32 +96,75 @@ module.exports = function(app, passport){
 		}
 		
 		// call makeDir function here with appropriate function parameters from req
-			
-			
+		
     });
 
     app.get('/cd', function(req, res) {
-			var path_folder =  './user_data/' + req.user.local.email  + '/' + req.query.directory +'/' + req.query.nameofdir;
-			if(!req.query.nameofdir.match(format)){
-				if(fs.existsSync(path_folder))
+    		//name of directory.
+    		var foldername = req.query.nameofdir;
+            if((foldername[0]=="/"))
+            {
+               	res.send({
+					value : 0
+ 
+              	})
+            }
+            else
+            {
+              	var default_path =  './user_data/' + req.user.local.email;
+              	var user_path =  default_path + '/' + req.query.directory +'/';
+
+            	// Initial Check whether path actualy exists or not
+            	if(!fs.existsSync(user_path + foldername)) {
+            		res.send({
+							value : -1,
+							string : foldername
+					});	
+					return;
+            	}
+
+            	// Resolves the specified paths into an absolute path
+              	var path_folder =  path_module.resolve("", user_path, foldername);
+
+              	path_folder = './' + path_folder.substr(__dirname.length - 5,path_folder.length);
+
+              	// Trying to access above the user folder
+              	if(path_folder.length < default_path.length) {
+					res.send({
+						value : 0
+					})
+					return;
+              	}
+
+              	// Absolute directory path in user folder
+              	foldername = path_folder.substr(default_path.length + 1, path_folder.length);
+
+				if(!foldername.match(format) || foldername == "")
 				{
+					if(fs.existsSync(path_folder))
+					{
 					
-					res.send({value : 1});
-				}
+						res.send({
+							value : 1,
+							string : foldername
+						})
+					}
+					else
+					{
+					
+						res.send({
+							value : -1,
+							string : foldername
+						});	
+					}	
+				}	
 				else
 				{
-					
-					res.send({value : -1});	
-				}
-				
-			}
-			else
-			{
-				res.send({
-					value : 0
-				})
-			}
-			
+					res.send({
+						value : 0
+					})
+				}   
+          	}	
 		});
   
 	app.get('/logout', function(req, res) {
