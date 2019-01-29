@@ -18,6 +18,7 @@
   "homepage": "https://github.com/abhigyank/Command-Line-Website#readme",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
+    "beepbeep": "^1.2.2",
     "body-parser": "^1.17.2",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.6",

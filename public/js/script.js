@@ -26,6 +26,13 @@ function reset(){
   $('.cursor').html('&nbsp');
 };
 
+document.addEventListener('keydown', function(event) {
+  if (event.keyCode == 9) {
+     event.preventDefault();
+     
+  }
+});
+
 $('textarea').keyup(function(e) {
   var command = $('textarea').val();
   var i;
@@ -607,6 +614,190 @@ $('textarea').keyup(function(e) {
     }
     reset();
     return;
+  }
+
+  else if(e.which==9 )
+  {
+    if(logged)
+    {
+
+      var command = $('textarea').val();
+      if(command== "")
+      {
+          
+        $.ajax({
+          type:'get',
+          datatype :'json',
+          data:{}, 
+          url:"/tabPress"
+          }).done(function(data){
+            
+          }).fail(function(jqXHR,exception){
+            $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+                
+            var msg = '';
+            if (jqXHR.status === 0) {
+              msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+              msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+              msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+              msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') { 
+              msg = 'Time out error.';
+            } else if (exception === 'abort') {
+              msg = 'Ajax request aborted.';
+            } else {
+              msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            if (data) console.error(data)
+            else console.log('Success!')
+          }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>ls: cannot list files "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
+          reset();
+      });
+      }
+      else
+      {
+
+        if(command.split(" ")[0].trim()=="cd" || ((command.includes("rm -r")==true && command.split(" ")[0] == "rm" && command.split(" ")[1] == "-r")) )
+        {
+          // reset();
+          if((command.split(" ")[0].trim()=="cd")==true)
+          {
+            name_autoPred=command.split(" ")[1].trim();
+          }
+          else
+          {
+            name_autoPred=command.split(" ")[2].trim();
+          }
+
+        $.ajax({
+          type:'get',
+          datatype :'json',
+          data:{ username : username , directory : directory,name_autoPred:name_autoPred}, 
+          url:"/autoprediction"
+          }).done(function(data){
+            if(data.value == 1)
+            {
+            
+              if(data.files.length == 1)
+              {
+                // reset();
+                if((command.split(" ")[0].trim()=="cd"))
+                {
+                  var predict_folder="cd ";
+                  if(directory=="")
+                  {
+                    var currentDir = data.dir;
+                  }   
+                  else
+                  {
+                    var currentDir = data.dir.substr(directory.length+1,data.dir.length);
+                  }
+                  // data.dir=data.dir(directory.length,data.dir.length)
+                  if(currentDir!="/")
+                  predict_folder = predict_folder +   currentDir;
+                  predict_folder += data.files[0];
+                  $('textarea').val('').val(predict_folder);
+                  $('#live').html(predict_folder);
+                  $('.cursor').html('&nbsp');
+                  
+                }
+                else
+                {
+                  var predict_folder="rm -r ";
+                  var currentDir = data.dir.substr(directory.length,data.dir.length);
+                  // data.dir=data.dir(directory.length,data.dir.length)
+                  if(currentDir!="/")
+                  {
+                    predict_folder = predict_folder +  currentDir;
+                  }
+                  predict_folder += data.files[0];
+                  $('textarea').val(predict_folder);
+                  $('#live').html(predict_folder);
+                  $('.cursor').html('&nbsp');
+              
+                }  
+                          
+              }
+              else
+              {
+                if(directory=="")
+                  $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username +  ': ~' + directory + '$ </span><span>' + command + '</span></div></div>'); 
+                else  
+                  $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username  +': ~/' + directory + '$ </span><span>' + command + '</span></div></div>'); 
+
+                for(num = 0;num < data.files.length ;num++)
+                {
+                    
+                  $('.terminal-output').append('<div class="folder"><div style="width: 100%;"><span> ' + data.files[num] + '</span></div></div>');
+                }
+                $('.terminal-output').append('<div class="result"><div style="width: 100%;"><br><span></span></div></div>');    
+                if(directory=="")
+                {
+                  $('#root').html('root@' + username + ': ~' + directory + '$ '); 
+                }     
+                else 
+                {
+                  $('#root').html('root@' + username + ': ~/' + directory + '$ ' );
+                }
+              }   
+            }
+            else if(data.value ==0)
+            {
+              if(directory=="")
+                  {
+
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory + '$ </span><span>' + command + '</span></div></div>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" +  name_autoPred + ": No such file or directory" +'</span></div></div><br>');
+                  }
+                  else
+                  {
+
+                    $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory + '$ </span><span>' + command + '</span></div></div>');
+                    $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>' + "bash: cd:" + name_autoPred +": No such file or directory" +'</span></div></div><br>');
+                  }
+                  reset();
+          }                 
+            // reset();
+
+        }).fail(function(jqXHR,exception){
+            $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+                
+            var msg = '';
+            if (jqXHR.status === 0) {
+              msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+              msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+              msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+              msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') { 
+              msg = 'Time out error.';
+            } else if (exception === 'abort') {
+              msg = 'Ajax request aborted.';
+            } else {
+              msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            if (data) console.error(data)
+            else console.log('Success!')
+          }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>ls: cannot list files "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
+          reset();
+      });
+      }
+    }
+  }
+    else
+    {
+      $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+      $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first</span></div></div><br>');
+      reset();
+
+    }
+    
+    
   }
 
   else if((e.which==40 || e.which==38)  && login==1){
