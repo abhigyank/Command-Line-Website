@@ -96,23 +96,15 @@ module.exports = function(app, passport){
 			{
 				//actual path required to list directories.
 				path = user_path + foldername.substr(0,foldername.lastIndexOf("/"));
+				dir = req.query.directory + foldername.slice(0,foldername.lastIndexOf("/"));
+            	dir += "/";
 			}
 			else
 			{
 				path = user_path;
+				dir =req.query.directory + "/";
 			}
 		
-          	if(foldername.includes("/")==true)
-          	{
-
-            	dir = req.query.directory + foldername.slice(0,foldername.lastIndexOf("/"));
-            	dir += "/";
-          	}
-          	else
-          	{
-
-            	dir =req.query.directory + "/";
-          	}
         	var last_dir_of_foldername=foldername.slice(foldername.lastIndexOf("/")+1,foldername.length);
         	//list of folder names.
         	var response = [];
