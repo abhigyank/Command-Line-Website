@@ -2,6 +2,7 @@ const  DirFunctions  = require('./helpers/folder.js');
 const fs = require('fs');
 const path_module = require('path');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+const predictionFolder = require('./helpers/prediction.js');
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -55,6 +56,80 @@ module.exports = function(app, passport){
     		return  res.send( { value : items });
 		})
 
+    });
+
+	// Receives an ajax get request from the client site to create sound
+    app.get('/tabPress', function(req, res) {
+    	//call CreateSound function to create sound.
+		predictionFolder.CreateSound();
+		 return res.send({
+			value : 1
+		});
+
+    });
+
+    // Receives an ajax get request from the client site to list the files in a directory for prediction
+	app.get('/autoprediction', function(req, res) {
+
+		//path where directories has to list.
+		var path="";
+		//for changing multiple directories in one command.
+		var dir="";
+		var foldername= req.query.name_autoPred;
+		if(foldername[0]=="/")
+		{
+			res.send({
+				value:0
+			})
+		}
+		else
+		{
+
+			var default_path =  './user_data/' + req.user.local.email;
+            var user_path =  default_path + '/' + req.query.directory +'/';
+            //Resolves specified path and stored in temp.
+			var temp=path_module.resolve("",user_path,foldername);
+
+			// This is needed in case the to be predicted text includes a / at end, then we have to look into the directory for all folders and files.
+			if(foldername[foldername.length-1] == '/') temp+='/';
+
+			foldername= temp.substr(__dirname.length-5,temp.length);
+			//name of folder.
+			// 11 == length of 'user_data/' and '/' after email.
+			foldername = foldername.substr(11 + req.user.local.email.length+ req.query.directory.length ,temp.length); 
+			if(foldername.includes("/")==true)
+			{
+				//actual path required to list directories.
+				path = user_path + foldername.substr(0,foldername.lastIndexOf("/"));
+				dir = req.query.directory + foldername.slice(0,foldername.lastIndexOf("/"));
+            	dir += "/";
+			}
+			else
+			{
+				path = user_path;
+				dir =req.query.directory + "/";
+			}
+		
+        	var last_dir_of_foldername=foldername.slice(foldername.lastIndexOf("/")+1,foldername.length);
+        	//list of folder names.
+        	var response = [];
+        	//Call ListFiles function properly to get the list of required folder names.
+        	response = predictionFolder.ListFiles(foldername,path,last_dir_of_foldername);
+        	if(response.length == 0)
+        	{
+        		res.send({
+        			value : 0
+        		})
+        	}
+        	else
+        	{
+        		res.send({
+        			value : 1,
+        			files : response,
+        			dir : dir
+        		});
+        	}
+		}
     });
 
 	// Receives an ajax get request from the client site to create a folder
@@ -122,12 +197,9 @@ module.exports = function(app, passport){
 					});	
 					return;
             	}
-
             	// Resolves the specified paths into an absolute path
               	var path_folder =  path_module.resolve("", user_path, foldername);
-
-              	path_folder = './' + path_folder.substr(__dirname.length - 5,path_folder.length);
-
+              	path_folder = './' + path_folder.substr(__dirname.length - 5,path_folder.length);           
               	// Trying to access above the user folder
               	if(path_folder.length < default_path.length) {
 					res.send({
@@ -138,7 +210,6 @@ module.exports = function(app, passport){
 
               	// Absolute directory path in user folder
               	foldername = path_folder.substr(default_path.length + 1, path_folder.length);
-
 				if(!foldername.match(format) || foldername == "")
 				{
 					if(fs.existsSync(path_folder))
