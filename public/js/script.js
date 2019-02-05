@@ -630,8 +630,6 @@ $('textarea').keyup(function(e) {
           datatype :'json',
           data:{}, 
           url:"/tabPress"
-          }).done(function(data){
-            
           }).fail(function(jqXHR,exception){
             $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
                 
@@ -659,10 +657,9 @@ $('textarea').keyup(function(e) {
       }
       else
       {
-
+        // Autocompletes folders for cd and rm -r command.
         if(command.split(" ")[0].trim()=="cd" || ((command.includes("rm -r")==true && command.split(" ")[0] == "rm" && command.split(" ")[1] == "-r")) )
         {
-          // reset();
           if((command.split(" ")[0].trim()=="cd")==true)
           {
             name_autoPred=command.split(" ")[1].trim();
@@ -679,11 +676,10 @@ $('textarea').keyup(function(e) {
           url:"/autoprediction"
           }).done(function(data){
             if(data.value == 1)
-            {
-            
+            {   
+              // There is only one predicted file/folder then autocomplete the file/folder name.
               if(data.files.length == 1)
               {
-                // reset();
                 if((command.split(" ")[0].trim()=="cd"))
                 {
                   var predict_folder="cd ";
@@ -695,20 +691,19 @@ $('textarea').keyup(function(e) {
                   {
                     var currentDir = data.dir.substr(directory.length+1,data.dir.length);
                   }
-                  // data.dir=data.dir(directory.length,data.dir.length)
+
                   if(currentDir!="/")
-                  predict_folder = predict_folder +   currentDir;
+                    predict_folder = predict_folder + currentDir;
                   predict_folder += data.files[0];
-                  $('textarea').val('').val(predict_folder);
+                  $('textarea').val('');
+                  $('textarea').val(predict_folder);
                   $('#live').html(predict_folder);
                   $('.cursor').html('&nbsp');
-                  
                 }
                 else
                 {
                   var predict_folder="rm -r ";
                   var currentDir = data.dir.substr(directory.length,data.dir.length);
-                  // data.dir=data.dir(directory.length,data.dir.length)
                   if(currentDir!="/")
                   {
                     predict_folder = predict_folder +  currentDir;
@@ -717,9 +712,7 @@ $('textarea').keyup(function(e) {
                   $('textarea').val(predict_folder);
                   $('#live').html(predict_folder);
                   $('.cursor').html('&nbsp');
-              
-                }  
-                          
+                }            
               }
               else
               {
@@ -730,7 +723,6 @@ $('textarea').keyup(function(e) {
 
                 for(num = 0;num < data.files.length ;num++)
                 {
-                    
                   $('.terminal-output').append('<div class="folder"><div style="width: 100%;"><span> ' + data.files[num] + '</span></div></div>');
                 }
                 $('.terminal-output').append('<div class="result"><div style="width: 100%;"><br><span></span></div></div>');    
@@ -744,13 +736,9 @@ $('textarea').keyup(function(e) {
                 }
               }   
             }
-            else if(data.value ==0)
-            {
-              //Nothing will shown on terminal.
-              //Only beep sound works.  
-            }                 
-            
-
+            //Else if no folder or file mathces.
+            //Nothing will shown on terminal.
+            //Only beep sound works.  
         }).fail(function(jqXHR,exception){
             $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
                 

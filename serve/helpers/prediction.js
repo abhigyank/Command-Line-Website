@@ -2,8 +2,7 @@ const fs = require('fs');
 //library for creating sound
 const beep = require('beepbeep');
 
-const ListFiles = function Myfunction(foldername,path,predictedFolder){
-  
+const ListFiles = function getFiles(foldername, path, predictedFolder){
   var files=[];
   var items=[];
   //Store the folders in files.
@@ -16,12 +15,12 @@ const ListFiles = function Myfunction(foldername,path,predictedFolder){
     if(element.substr(0,predictedFolder.length)==predictedFolder) 
       items.push(element);    
   });
-     if(items.length==0)
-      beep();
+  if(items.length==0)
+    beep();
   return items;
 }
 
-const CreateSound = function Myfunction(){
+const CreateSound = function beepSound(){
   beep();
 }
 module.exports = {

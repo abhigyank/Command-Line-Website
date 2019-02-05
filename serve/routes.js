@@ -86,11 +86,16 @@ module.exports = function(app, passport){
 		{
 
 			var default_path =  './user_data/' + req.user.local.email;
-              	var user_path =  default_path + '/' + req.query.directory +'/';
+            var user_path =  default_path + '/' + req.query.directory +'/';
             //Resolves specified path and stored in temp.
 			var temp=path_module.resolve("",user_path,foldername);
+
+			// This is needed in case the to be predicted text includes a / at end, then we have to look into the directory for all folders and files.
+			if(foldername[foldername.length-1] == '/') temp+='/';
+
 			foldername= temp.substr(__dirname.length-5,temp.length);
 			//name of folder.
+			// 11 == length of 'user_data/' and '/' after email.
 			foldername = foldername.substr(11 + req.user.local.email.length+ req.query.directory.length ,temp.length); 
 			if(foldername.includes("/")==true)
 			{
@@ -122,13 +127,9 @@ module.exports = function(app, passport){
         			value : 1,
         			files : response,
         			dir : dir
-        		})
+        		});
         	}
-        	
-
-        		
 		}
-		
     });
 
 	// Receives an ajax get request from the client site to create a folder
