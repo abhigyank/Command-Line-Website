@@ -560,6 +560,117 @@ $('textarea').keyup(function(e) {
       }
     }
 
+    else if(command=="ls -l"){
+
+      if(!logged)
+      {
+        $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+        $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>You need to login first</span></div></div><br>');
+        reset();
+      }
+      else 
+      {        
+        $.ajax({
+        type:'get',
+        datatype :'json',
+        data:{ username : username , directory : directory},   
+        url:"/ls-l"
+        }).done(function(data){
+            if(directory=="")
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~' + directory+ '$ </span><span>' + command + '</span></div></div>'); 
+            else  
+              $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~/' + directory+ '$ </span><span>' + command + '</span></div></div>'); 
+            
+            //list to store the names of folders
+            var list = [];
+            for(num =0;num<data.value.length;num++)
+              list[num] = data.value[num];
+            
+            //variables to get the maximum number in specific column.
+            var max=1,max2=2;
+            //Finding the maximum number in second and seventh column.
+            for(num =1;num<data.value.length;num++)
+            {
+                //for second column
+                var print = data.value[num];
+                print = print.split(" ")[1].trim();                           
+                if(max<print)
+                  max = print;
+
+                //for seventh column
+                print = data.value[num];
+                var index_secondLast = print.indexOf( ' ',5*print.indexOf( ' ' )  );
+                var new_print = print.slice(index_secondLast-2,index_secondLast);
+                if(max2<new_print)
+                  max2 = new_print;
+            }
+            
+            //Append zero before the number to get aligned with others in column. 
+            for(num =1;num<data.value.length;num++)
+            {
+                //for second column
+                if(max>9)
+                {
+                  var temp = list[num].split(" ")[2].trim(); 
+                  if(temp <=9)
+                  {
+                    var index_str = list[num].indexOf(temp); 
+                    list[num] = list[num].slice(0,index_str-1) + "0" + list[num].slice(index_str,list[num].length);
+                    
+                  }
+                }
+
+                //for seventh column
+                if(max2>9)
+                {
+                  var index_secondLast = print.indexOf( ' ',5*print.indexOf( ' ' )  );
+                  var temp = list[num].slice(index_secondLast-2,index_secondLast);
+                  if(temp <=9)
+                  {
+                    var index_str = list[num].indexOf(temp);
+                    list[num] = list[num].slice(0,index_secondLast-2) + "0" + list[num].slice(index_secondLast-1,list[num].length);
+                    
+                  }
+                }
+            }
+           
+
+            for(num = 0;num < data.value.length ;num++)
+            {
+                var print = data.value[num];
+                $('.terminal-output').append('<div class="command"><div style="width: 100%;"><span> ' + list[num] + '<br></span></div></div>');
+
+            }              
+            $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span><br></span></div></div>');            
+            reset();
+
+        }).fail(function(jqXHR,exception){
+            $('.terminal-output').append('<div class="command" role="presentation" aria-hidden="true"><div style="width: 100%;"><span class="user">root@' + username + ': ~$ </span><span>' + command + '</span></div></div>');
+                
+            var msg = '';
+            if (jqXHR.status === 0) {
+              msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+              msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+              msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+              msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') { 
+              msg = 'Time out error.';
+            } else if (exception === 'abort') {
+              msg = 'Ajax request aborted.';
+            } else {
+              msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            if (data) console.error(data)
+            else console.log('Success!')
+          }
+          $('.terminal-output').append('<div class="result"><div style="width: 100%;"><span>ls: cannot list files "'+ command.slice(2) + '"  : ' + msg + '</span></div></div><br>');
+          reset();
+      });
+      }
+    }
+
     else if(command=="logout"){
         if(logged)
         {
@@ -615,6 +726,7 @@ $('textarea').keyup(function(e) {
     reset();
     return;
   }
+
 
   else if(e.which==9 )
   {

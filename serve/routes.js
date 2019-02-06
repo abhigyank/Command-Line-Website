@@ -3,6 +3,7 @@ const fs = require('fs');
 const path_module = require('path');
 var format = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 const predictionFolder = require('./helpers/prediction.js');
+const cmd = require('node-cmd');
 
 module.exports = function(app, passport){
 	app.get('/', function(req, res){
@@ -57,6 +58,30 @@ module.exports = function(app, passport){
 		})
 
     });
+
+    app.get('/ls-l', function(req, res) {
+    	//path ro specify list of folders
+		var path = "./user_data" +  "/"+ req.user.local.email + "/" + req.query.directory;
+		//list to store the names of folder.
+		var list =[];
+		cmd.get(
+        'ls -l '+ path,
+        function(err, data, stderr){
+        	var num = 0;
+        	//save the lines separated by '\n' in list.
+        	while(data.split("\n")[num].trim() != "")
+        	{
+        		var print = data.split("\n")[num].trim();
+        		list.push(print);
+        		num++ ;
+
+        	} 	
+            res.send({
+            	value:list});
+            
+        }
+    );
+	});
 
 	// Receives an ajax get request from the client site to create sound
     app.get('/tabPress', function(req, res) {
