@@ -60,12 +60,15 @@ module.exports = function(app, passport){
     });
 
     app.get('/ls-l', function(req, res) {
+    	//path ro specify list of folders
 		var path = "./user_data" +  "/"+ req.user.local.email + "/" + req.query.directory;
+		//list to store the names of folder.
 		var list =[];
 		cmd.get(
         'ls -l '+ path,
         function(err, data, stderr){
         	var num = 0;
+        	//save the lines separated by '\n' in list.
         	while(data.split("\n")[num].trim() != "")
         	{
         		var print = data.split("\n")[num].trim();
